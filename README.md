@@ -6,6 +6,7 @@ python pyktok.py
 ```
 you should see `YOU ARE RUNNING MODIFIED VER` on the console. If you don't see this, you are running the original ver. of pyktok... create new conda/venv env <br>
 also, make sure to install required modules (bs4,pandas,etc.)
+
 -----
 
 **A simple module to collect video, text, and metadata from TikTok.**
