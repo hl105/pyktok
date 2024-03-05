@@ -241,9 +241,11 @@ def save_tiktok(video_url,
                 headers['referer'] = 'https://www.tiktok.com/'
                 # include cookies with the video request
                 tt_video = requests.get(tt_video_url, allow_redirects=True, headers=headers, cookies=cookies)
-            with open(video_fn, 'wb') as fn:
-                fn.write(tt_video.content)
-            print("Saved video\n", tt_video_url, "\nto\n", os.getcwd())
+                with open(video_fn, 'wb') as fn:
+                    fn.write(tt_video.content)
+                print("Saved video\n", tt_video_url, "\nto\n", os.getcwd())
+        else:
+            print("not saving videos")
 
         if metadata_fn != '':
             data_slot = tt_json['ItemModule'][video_id]
@@ -268,8 +270,9 @@ def save_tiktok(video_url,
         headers['referer'] = 'https://www.tiktok.com/'
         # include cookies with the video request
         tt_video = requests.get(tt_video_url, allow_redirects=True, headers=headers, cookies=cookies)
-        with open(video_fn, 'wb') as fn:
-            fn.write(tt_video.content)
+        if save_video == True:
+            with open(video_fn, 'wb') as fn:
+                fn.write(tt_video.content)
 
         if metadata_fn != '':
             data_slot = tt_json["__DEFAULT_SCOPE__"]['webapp.video-detail']['itemInfo']['itemStruct']
