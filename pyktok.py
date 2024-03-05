@@ -35,6 +35,7 @@ class BrowserNotSpecifiedError(Exception):
         super().__init__(runsb_err)
 
 def specify_browser(browser):
+    print("YOU ARE RUNNING MODIFIED VER")
     global cookies
     cookies = getattr(browser_cookie3,browser)(domain_name='www.tiktok.com')
     

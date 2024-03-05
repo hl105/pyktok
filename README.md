@@ -1,4 +1,12 @@
-## Pyktok
+##### Pyktok modified ver with working video save
+edit `pyktok.py` to pass in list of videos <br>
+to make sure you are running modified pyktok, when you run 
+```
+python pyktok.py
+```
+you should see `YOU ARE RUNNING MODIFIED VER` on the console. If you don't see this, you are running the original ver. of pyktok... create new conda/venv env <br>
+also, make sure to install required modules (bs4,pandas,etc.)
+
 **A simple module to collect video, text, and metadata from TikTok.**
 
 We developed Pyktok ("pick-tock") because none of the existing TikTok data collection utilities we could find suited our needs. Pyktok pulls its data directly from the JSON objects embedded in Tiktok pages and from hidden APIs with no public documentation. Here are its major features:
