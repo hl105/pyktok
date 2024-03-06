@@ -1,4 +1,4 @@
-##### Pyktok modified ver with working video save
+##### Pyktok modified ver with working video save and exception handling
 The true/false parameter inside pyk.save_tiktok_multi_urls(urls,  True, 'tiktok_data.csv', 5) would control if we want to save the videos or not, as intended. <br>
 edit `pyktok.py` to pass in list of videos <br>
 to make sure you are running modified pyktok, when you run 
