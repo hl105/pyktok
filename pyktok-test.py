@@ -1,5 +1,13 @@
-import pyktok
-pyktok.specify_browser('chrome')
-pyktok.save_tiktok_multi_urls(["https://www.tiktokv.com/share/video/7315561816673750318/","https://www.tiktokv.com/share/video/7314460767946837294/"], False, # save video file
+import json
+import pyktok as pyk
+
+with open('tiktok_history_sample.json') as fin:
+	data = json.load(fin)
+
+urls = [entry['Link'] for entry in data]
+
+pyk.specify_browser('chrome')
+
+pyk.save_tiktok_multi_urls(urls, False, # save video file
                 		   'tiktok_data.csv',
                 		    5)

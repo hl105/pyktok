@@ -8,6 +8,7 @@ Created on Thu Jul 14 14:06:01 2022
 import browser_cookie3
 from bs4 import BeautifulSoup
 from datetime import datetime
+from csv import writer
 import json
 import numpy as np
 import os
@@ -216,7 +217,11 @@ def save_tiktok(video_url,
     if save_video == False and metadata_fn == '':
         print('Since save_video and metadata_fn are both False/blank, the program did nothing.')
         return
-
+    
+    tt_video = None
+    tt_video_url = None
+    data_row = None
+    locate_el = True
     tt_json = get_tiktok_json(video_url,browser_name)
 
     if tt_json is not None:
@@ -231,7 +236,8 @@ def save_tiktok(video_url,
                     tt_video_url = slide['imageURL']['urlList'][0]
                     headers['referer'] = 'https://www.tiktok.com/'
                     # include cookies with the video request
-                    tt_video = requests.get(tt_video_url, allow_redirects=True, headers=headers, cookies=cookies)
+                    if tt_video_url:
+                        tt_video = requests.get(tt_video_url, allow_redirects=True, headers=headers, cookies=cookies)
                     with open(video_fn, 'wb') as fn:
                         fn.write(tt_video.content)
                     slidecount += 1
@@ -241,7 +247,8 @@ def save_tiktok(video_url,
                 tt_video_url = tt_json['ItemModule'][video_id]['video']['downloadAddr']
                 headers['referer'] = 'https://www.tiktok.com/'
                 # include cookies with the video request
-                tt_video = requests.get(tt_video_url, allow_redirects=True, headers=headers, cookies=cookies)
+                if tt_video_url:
+                    tt_video = requests.get(tt_video_url, allow_redirects=True, headers=headers, cookies=cookies)
                 with open(video_fn, 'wb') as fn:
                     fn.write(tt_video.content)
                 print("Saved video\n", tt_video_url, "\nto\n", os.getcwd())
@@ -249,46 +256,68 @@ def save_tiktok(video_url,
             print("not saving videos")
 
         if metadata_fn != '':
-            data_slot = tt_json['ItemModule'][video_id]
-            data_row = generate_data_row(data_slot)
+            try:
+                data_slot = tt_json['ItemModule'][video_id]
+                data_row = generate_data_row(data_slot)
+            except:
+                locate_el = False
             try:
                 user_id = list(tt_json['UserModule']['users'].keys())[0]
                 data_row.loc[0,"author_verified"] = tt_json['UserModule']['users'][user_id]['verified']
             except Exception:
                 pass
-            if os.path.exists(metadata_fn):
-                metadata = pd.read_csv(metadata_fn,keep_default_na=False)
-                combined_data = pd.concat([metadata,data_row])
-            else:
-                combined_data = data_row
-            combined_data.to_csv(metadata_fn,index=False)
+            try:
+                if os.path.exists(metadata_fn):
+                    metadata = pd.read_csv(metadata_fn,keep_default_na=False)
+                    combined_data = pd.concat([metadata,data_row])
+                else:
+                    combined_data = data_row
+                combined_data.to_csv(metadata_fn,index=False)
+            except:
+                pass
 
     else:
         tt_json = alt_get_tiktok_json(video_url,browser_name)
         regex_url = re.findall(url_regex, video_url)[0]
         video_fn = regex_url.replace('/', '_') + '.mp4'
-        tt_video_url = tt_json["__DEFAULT_SCOPE__"]['webapp.video-detail']['itemInfo']['itemStruct']['video']['downloadAddr']
+        try:
+            tt_video_url = tt_json["__DEFAULT_SCOPE__"]['webapp.video-detail']['itemInfo']['itemStruct']['video']['downloadAddr']
+        except:
+            locate_el = False
         headers['referer'] = 'https://www.tiktok.com/'
         # include cookies with the video request
-        tt_video = requests.get(tt_video_url, allow_redirects=True, headers=headers, cookies=cookies)
+        if tt_video_url:
+            tt_video = requests.get(tt_video_url, allow_redirects=True, headers=headers, cookies=cookies)
         if save_video == True:
             with open(video_fn, 'wb') as fn:
                 fn.write(tt_video.content)
 
         if metadata_fn != '':
-            data_slot = tt_json["__DEFAULT_SCOPE__"]['webapp.video-detail']['itemInfo']['itemStruct']
-            data_row = generate_data_row(data_slot)
+            try:
+                data_slot = tt_json["__DEFAULT_SCOPE__"]['webapp.video-detail']['itemInfo']['itemStruct']
+                data_row = generate_data_row(data_slot)
+            except:
+                locate_el = False
             try:
                 user_id = list(tt_json['UserModule']['users'].keys())[0]
                 data_row.loc[0,"author_verified"] = tt_json["__DEFAULT_SCOPE__"]['webapp.video-detail']['itemInfo']['itemStruct']['author']
             except Exception:
                 pass
-            if os.path.exists(metadata_fn):
-                metadata = pd.read_csv(metadata_fn,keep_default_na=False)
-                combined_data = pd.concat([metadata,data_row])
-            else:
-                combined_data = data_row
-            combined_data.to_csv(metadata_fn,index=False)
+            try:
+                if os.path.exists(metadata_fn):
+                    metadata = pd.read_csv(metadata_fn,keep_default_na=False)
+                    combined_data = pd.concat([metadata,data_row])
+                else:
+                    combined_data = data_row
+                combined_data.to_csv(metadata_fn,index=False)
+            except:
+                pass
+    
+    if not locate_el:
+        with open("failed_to_locate.csv", 'a') as fn:
+                csvwriter = writer(fn)
+                csvwriter.writerow([video_url])
+                fn.close()
 
     if save_video == True:
         print("Saved video\n", tt_video_url, "\nto\n", os.getcwd())
@@ -330,6 +359,12 @@ def save_tiktok_multi_urls(video_urls,
         tt_urls = open(video_urls).read().splitlines()
     else:
         tt_urls = video_urls
+
+    with open("failed_to_locate.csv", 'w') as fn:
+                csvwriter = writer(fn)
+                csvwriter.writerow(["video_url"])
+                fn.close()
+
     for u in tt_urls:
         save_tiktok(u,save_video,metadata_fn,browser_name)
         time.sleep(random.randint(1, sleep))
