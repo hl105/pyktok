@@ -238,8 +238,9 @@ def save_tiktok(video_url,
                     # include cookies with the video request
                     if tt_video_url:
                         tt_video = requests.get(tt_video_url, allow_redirects=True, headers=headers, cookies=cookies)
-                    with open(video_fn, 'wb') as fn:
-                        fn.write(tt_video.content)
+                    if tt_video:
+                        with open(video_fn, 'wb') as fn:
+                            fn.write(tt_video.content)
                     slidecount += 1
             else:
                 regex_url = re.findall(url_regex, video_url)[0]
@@ -249,8 +250,9 @@ def save_tiktok(video_url,
                 # include cookies with the video request
                 if tt_video_url:
                     tt_video = requests.get(tt_video_url, allow_redirects=True, headers=headers, cookies=cookies)
-                with open(video_fn, 'wb') as fn:
-                    fn.write(tt_video.content)
+                if tt_video:
+                    with open(video_fn, 'wb') as fn:
+                        fn.write(tt_video.content)
                 print("Saved video\n", tt_video_url, "\nto\n", os.getcwd())
         else:
             print("not saving videos")
@@ -288,7 +290,7 @@ def save_tiktok(video_url,
         # include cookies with the video request
         if tt_video_url:
             tt_video = requests.get(tt_video_url, allow_redirects=True, headers=headers, cookies=cookies)
-        if save_video == True:
+        if save_video == True and tt_video:
             with open(video_fn, 'wb') as fn:
                 fn.write(tt_video.content)
 
