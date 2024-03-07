@@ -54,6 +54,7 @@ def generate_data_row(video_obj):
                    'video_timestamp',
                    'video_duration',
                    'video_locationcreated',
+                   'suggested_words',
                    'video_diggcount',
                    'video_sharecount',
                    'video_commentcount',
@@ -82,6 +83,10 @@ def generate_data_row(video_obj):
         data_list.append(np.nan)
     try:
         data_list.append(video_obj['locationCreated'])
+    except Exception:
+        data_list.append('')
+    try:
+        data_list.append(", ".join(video_obj['suggestedWords']))
     except Exception:
         data_list.append('')
     try:
